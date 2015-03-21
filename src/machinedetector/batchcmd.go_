@@ -1,0 +1,99 @@
+package main
+
+import (
+	"fmt"
+	"github.com/golang/glog"
+	"io/ioutil"
+	"log"
+	"net"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"sync"
+)
+
+// https://www.godoc.org/
+
+func main() {
+	if len(os.Args) < 2 {
+		log.Print("usage: ", os.Args[0], " <argName>")
+		os.Exit(1)
+	}
+
+	// Find binary path
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Print(dir)
+
+	argName := os.Args[1]
+
+	// Cd to binary path
+	err = os.Chdir(dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Load machinelist
+	bytearr, err := ioutil.ReadFile("./machinelist")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	os.MkdirAll("../log", 0755)
+	glog.SetLogDir("../log")
+
+	stringcontent := string(bytearr)
+	servArr := strings.Split(stringcontent, "\n")
+
+	wg := new(sync.WaitGroup)
+	mutex := &sync.Mutex{}
+
+	infoHash := make(map[string][]string)
+
+	for i, serv := range servArr {
+		serv = strings.Trim(serv, " \n")
+		if len(serv) == 0 {
+			continue
+		}
+		wg.Add(1)
+		go func(pi int, pserv string) {
+			defer wg.Done()
+			ips, err := net.LookupHost(pserv)
+			if err != nil {
+				log.Print(pserv, "resolve failed", err)
+			} else {
+				cmd := fmt.Sprintf("%s/VisitServ", dir)
+				args := make([]string, 5, 5)
+				args[0] = "--type=X"
+				args[1] = fmt.Sprintf("--ip=%s", ips[0])
+				args[2] = "--port=X"
+				args[3] = "--timeout=3000"
+				args[4] = fmt.Sprintf("%s", argName)
+
+				log.Print(pi, "]", pserv, "->", ips)
+				out, err := exec.Command(cmd, args...).Output()
+				glog.Infof("%d=%s==%s===%v==", pi, pserv, cmd, args)
+				if err != nil {
+					glog.Info(err)
+				} else {
+					glog.Infof("%s", out)
+					outstr := string(out)
+					mutex.Lock()
+					infoHash[outstr] = append(infoHash[outstr], pserv)
+					mutex.Unlock()
+				}
+			}
+		}(i, serv)
+	}
+
+	wg.Wait()
+
+	glog.Infof("len(infoHash) = %d", len(infoHash))
+	glog.Info(infoHash)
+	glog.Info("Ready to quit!")
+	glog.Flush()
+	os.Exit(0)
+}

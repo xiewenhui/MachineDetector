@@ -1,0 +1,75 @@
+package mdpb;
+
+option optimize_for = SPEED;
+
+message Conf {
+  optional string masterRedis       = 1;
+  optional string backupRedis       = 2;
+  optional int32  redisPort         = 3;
+  optional int32  redisConnTimeOut  = 4;
+  optional int32  redisSockTimeOut  = 5;
+  optional string redisDatabase     = 6;
+  optional string redisPasswd       = 7;
+
+  optional int32  statusPort        = 9;
+
+  optional int32  mtItemPeriod      = 10;
+  optional string masterMemcached   = 11;
+  optional string slaveMemcached    = 12;
+  optional int32  cacheRetryTimeout = 13;
+  optional int32  cacheConnTimeout  = 14;
+  optional int64  logLiveTime       = 15;
+
+  optional string DbHosts           = 16;
+  optional int32  DbPort            = 17;
+  optional string DbName            = 18;
+  optional string DbUser            = 19;
+  optional string DbPass            = 20;
+  optional string DbCharSet         = 21;
+  optional int32  DbRTimeOut        = 22;
+  optional int32  DbWTimeOut        = 23;
+  optional int32  DbCTimeOut        = 24;
+  optional int32  DbMinConn         = 25;
+  optional int32  DbMaxConn         = 26;
+  optional int32  DbRetryTimes      = 27;
+  optional int32  DbRetryIntval     = 28;
+
+  optional string remoteConf          = 73;
+  optional int32  enableRemoteConf    = 74;
+
+  optional int32  sshTimeOutMs       = 80;
+  optional int32  pingTimeOutMs      = 81;
+  optional int32  conCurrency        = 82;
+  optional string logDir             = 83;
+}
+
+message RemoteConf {
+  optional string redisHost         = 1;
+  optional int32  redisPort         = 2;
+  optional string redisPasswd       = 3;
+  optional string backupRedis       = 4;
+
+  optional string masterMemcached   = 6;
+  optional string slaveMemcached    = 7;
+
+  optional string DbHost            = 11;
+  optional int32  DbPort            = 12;
+  optional string DbName            = 13;
+  optional string DbUser            = 14;
+  optional string DbPass            = 15;
+  optional string DbVip1            = 16;
+  optional string DbVip2            = 17;
+}
+
+message StringVec {
+  repeated string strs = 1;
+  optional int64  millisec = 2;
+
+  optional string DbHost            = 11;
+  optional int32  DbPort            = 12;
+  optional string DbName            = 13;
+  optional string DbUser            = 14;
+  optional string DbPass            = 15;
+  optional string localhost         = 16;
+}
+
