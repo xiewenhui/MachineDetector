@@ -39,7 +39,7 @@ echo "$GOROOT"
 echo "$PATH"
 
 echo "Start building protoc-gen-go plugin ..."
-#go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
+go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
 #make -C $CURR_DIR/src/github.com/golang/protobuf/
 #go get -u github.com/golang/glog
 #go get github.com/garyburd/redigo/redis
